@@ -6,7 +6,7 @@ A very much in-progress, small **PHP 5.3** library designed to facilitate functi
 This means making the best of anonymous functions, a.k.a. lambdas or closures.
 
 
-# Example
+## Example
 
 The following exemplifies using the `L::map` function on an array,
 which transforms each value by passing it through a supplied function,
@@ -32,7 +32,7 @@ $mapTimes10(array(8, 9, 10)); // > array(80, 90, 100)
 ```
 
 
-# Why
+## Why
 
 I'm currently mostly doing javascript programming, and with it I've been exploring functional concepts.
 When I need to do PHP work, it's become painful enough that I figured I needed the tool to streamline my workflow.
@@ -41,7 +41,7 @@ particularly lacking is partial application/currying.
 That's why I felt the need to start this one.
 
 
-# Acknowledgements
+## Acknowledgements
 
 I've drawn inspiration from libraries such as these:
 
