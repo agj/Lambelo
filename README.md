@@ -2,7 +2,7 @@
 Lambelo
 =======
 
-A very much in-progress, small **PHP 5.3** library designed to facilitate functional programming.
+A very much in-progress, small **PHP 5.3+** library designed to facilitate functional programming.
 This means making the best of anonymous functions, a.k.a. lambdas or closures.
 
 

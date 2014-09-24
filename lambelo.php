@@ -68,6 +68,20 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		return $autoCurryTo($arity, $fn);
 	};
 
+	$partial = function ($fn) {
+		$args = array_slice(func_get_args(), 1);
+		return function () use ($fn, $args) {
+			return call_user_func_array($fn, array_merge($args, func_get_args()));
+		};
+	};
+
+	$partialRight = function ($fn) {
+		$args = array_slice(func_get_args(), 1);
+		return function () use ($fn, $args) {
+			return call_user_func_array($fn, array_merge(func_get_args(), $args));
+		};
+	};
+
 	$flipTo = function ($arity, $fn) {
 		return function () use ($fn, $arity) {
 			$args = array_slice(func_get_args(), 0, $arity);
@@ -185,37 +199,39 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 	// Defining utilities.
 
 	L::$fns = array(
-		'compose'     => $autoCurryTo(1, $compose),
-		'sequence'    => $autoCurryTo(1, $sequence),
-		'call'        => $autoCurryTo(2, $call),
-		'callOn'      => $autoCurryTo(2, $flipTo(2, $call)),
-		'apply'       => $autoCurry($apply),
-		'applyOn'     => $autoCurryTo(2, $flip($apply)),
-		'autoCurry'   => $autoCurry,
-		'autoCurryTo' => $autoCurryTo,
-		'flip'        => $autoCurry($flip),
-		'flipTo'      => $autoCurry($flipTo),
-		'arity'       => $autoCurry($arity),
+		'compose'      => $autoCurryTo(1, $compose),
+		'sequence'     => $autoCurryTo(1, $sequence),
+		'call'         => $autoCurryTo(2, $call),
+		'callOn'       => $autoCurryTo(2, $flipTo(2, $call)),
+		'apply'        => $autoCurry($apply),
+		'applyOn'      => $autoCurryTo(2, $flip($apply)),
+		'autoCurry'    => $autoCurry,
+		'autoCurryTo'  => $autoCurryTo,
+		'partial'      => $autoCurry($partial),
+		'partialRight' => $autoCurry($partialRight),
+		'flip'         => $autoCurry($flip),
+		'flipTo'       => $autoCurry($flipTo),
+		'arity'        => $autoCurry($arity),
 		
-		'map'         => $autoCurry($map),
-		'mapOn'       => $autoCurryTo(2, $flip($map)),
-		'reduce'      => $autoCurry($reduce),
-		'reduceOn'    => $autoCurryTo(2, $reduceOn),
-		'filter'      => $autoCurry($filter),
-		'filterOn'    => $autoCurryTo(2, $flip($filter)),
-		'each'        => $autoCurry($each),
-		'eachOn'      => $autoCurryTo(2, $flip($each)),
+		'map'          => $autoCurry($map),
+		'mapOn'        => $autoCurryTo(2, $flip($map)),
+		'reduce'       => $autoCurry($reduce),
+		'reduceOn'     => $autoCurryTo(2, $reduceOn),
+		'filter'       => $autoCurry($filter),
+		'filterOn'     => $autoCurryTo(2, $flip($filter)),
+		'each'         => $autoCurry($each),
+		'eachOn'       => $autoCurryTo(2, $flip($each)),
 		
-		'prop'        => $autoCurry($prop),
-		'keys'        => $autoCurry($keys),
+		'prop'         => $autoCurry($prop),
+		'keys'         => $autoCurry($keys),
 		
-		'equals'      => $autoCurry($equals),
+		'equals'       => $autoCurry($equals),
 		
-		'flatten'     => $autoCurry($flatten),
-		'flattenTo'   => $autoCurry($flattenTo),
-		'unique'      => $autoCurry($unique),
-		'sort'        => $autoCurry($sort),
-		'sortBy'      => $autoCurry($sortBy),
+		'flatten'      => $autoCurry($flatten),
+		'flattenTo'    => $autoCurry($flattenTo),
+		'unique'       => $autoCurry($unique),
+		'sort'         => $autoCurry($sort),
+		'sortBy'       => $autoCurry($sortBy),
 	);
 
 });
