@@ -85,6 +85,13 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		return $flipTo($arity, $fn);
 	};
 
+	$arity = function ($n, $fn) {
+		return function () use ($n, $fn) {
+			$args = array_slice(func_get_args(), 0, $n);
+			return call_user_func_array($fn, $args);
+		};
+	};
+
 
 	// Iteration.
 
@@ -97,15 +104,31 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		return array_reduce($obj, $fn, $initial);
 	};
 
+	$reduceOn = function ($obj, $fn, $initial = null) {
+		if (is_null($initial)) return array_reduce($obj, $fn);
+		return array_reduce($obj, $fn, $initial);
+	};
+
 	$filter = function ($fn, $obj) {
 		return array_filter($obj, $fn);
 	};
 
+	$each = function ($fn, $obj) {
+		foreach ($obj as $key => $value) {
+			$fn($value, $key, $obj);
+		}
+		return $obj;
+	};
 
-	// Extraction?
+
+	// Extraction.
 
 	$prop = function ($prop, $obj) {
 		return $obj[$prop];
+	};
+
+	$keys = function ($obj) {
+		return array_keys($obj);
 	};
 
 
@@ -172,17 +195,22 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		'autoCurryTo' => $autoCurryTo,
 		'flip'        => $autoCurry($flip),
 		'flipTo'      => $autoCurry($flipTo),
-
+		'arity'       => $autoCurry($arity),
+		
 		'map'         => $autoCurry($map),
 		'mapOn'       => $autoCurryTo(2, $flip($map)),
 		'reduce'      => $autoCurry($reduce),
-		'reduceOn'    => $autoCurryTo(2, $flip($reduce)),
+		'reduceOn'    => $autoCurryTo(2, $reduceOn),
 		'filter'      => $autoCurry($filter),
 		'filterOn'    => $autoCurryTo(2, $flip($filter)),
-
+		'each'        => $autoCurry($each),
+		'eachOn'      => $autoCurryTo(2, $flip($each)),
+		
 		'prop'        => $autoCurry($prop),
+		'keys'        => $autoCurry($keys),
+		
 		'equals'      => $autoCurry($equals),
-
+		
 		'flatten'     => $autoCurry($flatten),
 		'flattenTo'   => $autoCurry($flattenTo),
 		'unique'      => $autoCurry($unique),
