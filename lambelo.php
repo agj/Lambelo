@@ -30,6 +30,12 @@ $autoCurryTo = function ($arity, $fn) use (&$autoCurryTo) {
 	};
 };
 
+$ascSort = function ($left, $right) {
+	if ($left === $right) return 0;
+	if ($left > $right)   return -1;
+	if ($left < $right)   return 1;
+};
+
 L::$fns = array(
 	'autoCurry' => $autoCurry,
 
@@ -39,7 +45,58 @@ L::$fns = array(
 		return array_map($fn, $obj);
 	}),
 
+	'reduce' => $autoCurry( function ($fn, $obj, $initial = null) {
+		if (is_null($initial)) return array_reduce($obj, $fn);
+		return array_reduce($obj, $fn, $initial);
+	}),
+
 	'filter' => $autoCurry( function ($fn, $obj) {
 		return array_filter($obj, $fn);
 	}),
+
+	'prop' => $autoCurry( function ($prop, $obj) {
+		return $obj[$prop];
+	}),
+
+	'flatten' => $autoCurry( function ($obj) {
+		return L::flattenTo(999999, $obj);
+	}),
+
+	'flattenTo' => $autoCurry( function ($depth, $obj) {
+		if ($depth <= 0) return $obj;
+		return L::reduce( function ($memo, $item) {
+			if (is_array($item)) return array_merge($memo, L::flattenTo($depth - 1, $item));
+			$memo[] = $item;
+			return $memo;
+		}, $obj, array());
+	}),
+
+	'unique' => $autoCurry( function ($arr) {
+		return L::reduce( function ($memo, $item) {
+			if (in_array($item, $memo)) return $memo;
+			$memo[] = $item;
+			return $memo;
+		}, $arr, array());
+	}),
+
+	'sort' => $autoCurry( function ($arr) use ($ascSort) {
+		return L::sortBy($ascSort, $arr);
+	}),
+
+	'sortBy' => $autoCurry( function ($fn, $arr) {
+		$len = count($arr);
+		if ($len <= 1) return $arr;
+		$pivot = $arr[0];
+		$left = array(); $right = array();
+		$i = 0;
+		while (++$i < $len) {
+			$item = $arr[$i];
+			$comparison = $fn($pivot, $item);
+			if ($comparison >= 0) $right[] = $item;
+			else $left[] = $item;
+		}
+		return array_merge(L::sortBy($fn, $left), array($pivot), L::sortBy($fn, $right));
+	}),
 );
+
+
