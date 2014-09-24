@@ -97,6 +97,22 @@ L::$fns = array(
 		}
 		return array_merge(L::sortBy($fn, $left), array($pivot), L::sortBy($fn, $right));
 	}),
+
+	'sequence' => $autoCurryTo(1, function () {
+		$fns = func_get_args();
+		return function () use ($fns) {
+			return L::reduce( function ($memo, $fn) {
+				return $fn($memo);
+			}, array_slice($fns, 1), call_user_func_array($fns[0], func_get_args()));
+		};
+	}),
+
+	'call' => $autoCurryTo(2, function ($fn) {
+		$args = array_slice(func_get_args(), 1);
+		return call_user_func_array($fn, $args);
+	}),
+
+	'apply' => $autoCurry( function ($fn, $args) {
+		return call_user_func_array($fn, $args);
+	}),
 );
-
-
