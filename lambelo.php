@@ -4,6 +4,7 @@ class L {
 
 	static function __callStatic($name, $args) {
 		$fn = self::$fns[$name];
+		if (!$fn) throw new Exception("Lambelo has no function " . var_export($name, true) . ".");
 		return call_user_func_array($fn, $args);
 	}
 
@@ -11,6 +12,41 @@ class L {
 }
 
 call_user_func( function () { // Creating a closure to prevent variable leakage.
+
+	// Internal utils.
+
+	$ascSort = function ($left, $right) {
+		if ($left === $right) return 0;
+		if ($left > $right)   return -1;
+		if ($left < $right)   return 1;
+	};
+
+
+	// Function.
+
+	$sequence = function () {
+		$fns = func_get_args();
+		return function () use ($fns) {
+			return L::reduce( function ($memo, $fn) {
+				return $fn($memo);
+			}, array_slice($fns, 1), call_user_func_array($fns[0], func_get_args()));
+		};
+	};
+
+	$compose = function () {
+		$fns = func_get_args();
+		$fns = array_reverse($fns);
+		return call_user_func_array(L::sequence(), $fns);
+	};
+
+	$call = function ($fn) {
+		$args = array_slice(func_get_args(), 1);
+		return call_user_func_array($fn, $args);
+	};
+
+	$apply = function ($fn, $args) {
+		return call_user_func_array($fn, $args);
+	};
 
 	$autoCurryTo = function ($arity, $fn) use (&$autoCurryTo) {
 		return function () use ($fn, $arity, $autoCurryTo) {
@@ -32,11 +68,25 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		return $autoCurryTo($arity, $fn);
 	};
 
-	$ascSort = function ($left, $right) {
-		if ($left === $right) return 0;
-		if ($left > $right)   return -1;
-		if ($left < $right)   return 1;
+	$flipTo = function ($arity, $fn) {
+		return function () use ($fn, $arity) {
+			$args = array_slice(func_get_args(), 0, $arity);
+			while (count($args) < $arity) {
+				$args[] = null;
+			}
+			$args = array_reverse($args);
+			return call_user_func_array($fn, $args);
+		};
 	};
+
+	$flip = function ($fn) use ($flipTo) {
+		$ref = new ReflectionFunction($fn);
+		$arity = $ref->getNumberOfRequiredParameters();
+		return $flipTo($arity, $fn);
+	};
+
+
+	// Iteration.
 
 	$map = function ($fn, $obj) {
 		return array_map($fn, $obj);
@@ -51,9 +101,22 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		return array_filter($obj, $fn);
 	};
 
+
+	// Extraction?
+
 	$prop = function ($prop, $obj) {
 		return $obj[$prop];
 	};
+
+
+	// Comparison.
+
+	$equals = function ($a, $b) {
+		return $a === $b;
+	};
+
+
+	// Convenience.
 
 	$flatten = function ($obj) {
 		return L::flattenTo(999999, $obj);
@@ -95,45 +158,36 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		return array_merge(L::sortBy($fn, $left), array($pivot), L::sortBy($fn, $right));
 	};
 
-	$sequence = function () {
-		$fns = func_get_args();
-		return function () use ($fns) {
-			return L::reduce( function ($memo, $fn) {
-				return $fn($memo);
-			}, array_slice($fns, 1), call_user_func_array($fns[0], func_get_args()));
-		};
-	};
 
-	$call =function ($fn) {
-		$args = array_slice(func_get_args(), 1);
-		return call_user_func_array($fn, $args);
-	};
-
-	$apply = function ($fn, $args) {
-		return call_user_func_array($fn, $args);
-	};
-
-	$equals = function ($a, $b) {
-		return $a === $b;
-	};
-
+	// Defining utilities.
 
 	L::$fns = array(
+		'compose'     => $autoCurryTo(1, $compose),
+		'sequence'    => $autoCurryTo(1, $sequence),
+		'call'        => $autoCurryTo(2, $call),
+		'callTo'      => $autoCurryTo(2, $flipTo(2, $call)),
+		'apply'       => $autoCurry($apply),
+		'applyTo'     => $autoCurryTo(2, $flip($apply)),
 		'autoCurry'   => $autoCurry,
 		'autoCurryTo' => $autoCurryTo,
+		'flip'        => $autoCurry($flip),
+		'flipTo'      => $autoCurry($flipTo),
+
 		'map'         => $autoCurry($map),
+		'mapTo'       => $autoCurryTo(2, $flip($map)),
 		'reduce'      => $autoCurry($reduce),
+		'reduceTo'    => $autoCurryTo(2, $flip($reduce)),
 		'filter'      => $autoCurry($filter),
+		'filterTo'    => $autoCurryTo(2, $flip($filter)),
+
 		'prop'        => $autoCurry($prop),
+		'equals'      => $autoCurry($equals),
+
 		'flatten'     => $autoCurry($flatten),
 		'flattenTo'   => $autoCurry($flattenTo),
 		'unique'      => $autoCurry($unique),
 		'sort'        => $autoCurry($sort),
 		'sortBy'      => $autoCurry($sortBy),
-		'sequence'    => $autoCurryTo(1, $sequence),
-		'call'        => $autoCurryTo(2, $call),
-		'apply'       => $autoCurry($apply),
-		'equals'      => $autoCurry($equals),
 	);
 
 });
