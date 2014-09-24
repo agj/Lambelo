@@ -23,5 +23,13 @@ describe("L::autoCurryTo", function () {
 			->toBe( 'abx' );
 	});
 
+	it("is fully auto-curried", function () use ($join3) {
+		$temp = L::autoCurryTo(2);
+		$temp = $temp($join3);
+		$temp = $temp('a');
+		expect( $temp('b') )
+			->toBe( 'abx' );
+	});
+
 });
 

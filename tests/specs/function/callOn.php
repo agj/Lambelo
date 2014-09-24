@@ -11,5 +11,12 @@ describe("L::callOn", function () {
 			->toBe( 'firstsecond' );
 	});
 
+	it("is fully auto-curried", function () use ($join) {
+		$temp = L::callOn('first');
+		$temp = $temp('second', $join);
+		expect( $temp )
+			->toBe( 'firstsecond' );
+	});
+
 });
 

@@ -10,7 +10,7 @@ describe("L::partialRight", function () {
 		$_that = L::partialRight($join3, 'that');
 		expect( $_that('what', 'is') )
 			->toBe( 'whatisthat' );
-		
+
 		$_arewe = L::partialRight($join3, 'are', 'we');
 		expect( $_arewe('who') )
 			->toBe( 'whoarewe' );

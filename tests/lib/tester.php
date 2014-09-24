@@ -20,9 +20,23 @@ $__tester__catchError = function ($fn) {
 	return $error;
 };
 
+function __tester__indent($amount) {
+	return function ($text) use ($amount) {
+		$text = (string)$text;
+		$spaces = str_repeat('    ', $amount);
+		$text = explode("\n", $text);
+		$text = implode("\n". $spaces, $text);
+		$text = rtrim($text, ' ');
+		return $spaces . $text;
+	};
+}
+
 
 function describe($description, $fn) {
 	global $__tester__currentPath;
+
+	$ind = __tester__indent(count($__tester__currentPath));
+	echo $ind($description ."\n");
 
 	$originalPath = $__tester__currentPath;
 	$__tester__currentPath[] = $description;
@@ -37,30 +51,33 @@ function it($description, $fn) {
 
 	$br = "\n";
 	$brbr = $br . $br;
+	$indDesc = __tester__indent(count($__tester__currentPath));
+	$ind = __tester__indent(count($__tester__currentPath) + 1);
 
 	$__tester__expectationResults = array();
 
 	$error = $__tester__catchError($fn);
 
-	echo implode(' ', $__tester__currentPath) . ' ' . $description . $brbr;
+	// echo implode(' ', $__tester__currentPath) . ' ' . $description . $brbr;
+	echo $indDesc($description .$br);
 
 	if ($error) {
-		echo 'ERROR: An exception was thrown:' .$br;
-		echo $error;
+		echo $ind($br. 'ERROR: An exception was thrown:' .$br);
+		echo $error .$brbr;
 
 	} else {
 		$hasErrors = false;
 
 		foreach ($__tester__expectationResults as $result) {
 			if (!$result->isCorrect) {
-				echo 'ERROR: Expected' .$br. $result->value .$br. $result->comparison .$br. $result->expectation .$brbr;
+				echo $ind($br. 'ERROR: Expected' .$br. $result->value .$br. $result->comparison .$br. $result->expectation .$brbr);
 				$hasErrors = true;
 			}
 		}
 
 		if (!$hasErrors) {
 			if (count($__tester__expectationResults) === 0)
-				echo 'ERROR: No check was made!';
+				echo $ind($br. 'ERROR: No check was made!' .$brbr);
 		}
 	}
 }

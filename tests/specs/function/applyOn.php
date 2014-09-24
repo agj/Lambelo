@@ -11,5 +11,11 @@ describe("L::applyOn", function () {
 			->toBe( 'firstsecond' );
 	});
 
+	it("is fully auto-curried", function () use ($join) {
+		$temp = L::applyOn(array('first', 'second'));
+		expect( $temp($join) )
+			->toBe( 'firstsecond' );
+	});
+
 });
 

@@ -13,5 +13,12 @@ describe("L::flipTo", function () {
 			->toBe( 'bax' );
 	});
 
+	it("is fully auto-curried", function () use ($join3) {
+		$temp = L::flipTo(2);
+		$temp = $temp($join3);
+		expect( $temp('a', 'b', 'c') )
+			->toBe( 'bax' );
+	});
+
 });
 

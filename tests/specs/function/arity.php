@@ -13,5 +13,12 @@ describe("L::arity", function () {
 			->toBe( 'abx' );
 	});
 
+	it("is fully auto-curried", function () use ($join3) {
+		$temp = L::arity(2);
+		$temp = $temp($join3);
+		expect( $temp('a', 'b', 'c') )
+			->toBe( 'abx' );
+	});
+
 });
 
