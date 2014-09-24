@@ -44,6 +44,13 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		return call_user_func_array($fn, $args);
 	};
 
+	$callOn = function () {
+		$all = func_get_args();
+		$args = array_slice($all, 0, -1);
+		$fn = end($all);
+		return call_user_func_array($fn, $args);
+	};
+
 	$apply = function ($fn, $args) {
 		return call_user_func_array($fn, $args);
 	};
@@ -202,7 +209,7 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		'compose'      => $autoCurryTo(1, $compose),
 		'sequence'     => $autoCurryTo(1, $sequence),
 		'call'         => $autoCurryTo(2, $call),
-		'callOn'       => $autoCurryTo(2, $flipTo(2, $call)),
+		'callOn'       => $autoCurryTo(2, $callOn),
 		'apply'        => $autoCurry($apply),
 		'applyOn'      => $autoCurryTo(2, $flip($apply)),
 		'autoCurry'    => $autoCurry($autoCurry),
