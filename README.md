@@ -13,7 +13,7 @@ which transforms each value by passing it through a supplied function,
 and returns a new array (equivalent to PHP's native `array_map`).
 
 ```php
-require_once 'functional.php';
+require_once 'lambelo.php';
 
 $times10 = function ($n) {
 	return $n * 10;
