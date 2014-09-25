@@ -116,22 +116,22 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 
 	// Iteration.
 
-	$map = function ($fn, $obj) {
-		return array_map($fn, $obj);
+	$map = function ($fn, $arr) {
+		return array_map($fn, $arr);
 	};
 
-	$reduce = function ($fn, $obj, $initial = null) {
-		if (is_null($initial)) return array_reduce($obj, $fn);
-		return array_reduce($obj, $fn, $initial);
+	$reduce = function ($fn, $arr, $initial = null) {
+		if (is_null($initial)) return array_reduce($arr, $fn);
+		return array_reduce($arr, $fn, $initial);
 	};
 
-	$reduceOn = function ($obj, $fn, $initial = null) {
-		if (is_null($initial)) return array_reduce($obj, $fn);
-		return array_reduce($obj, $fn, $initial);
+	$reduceOn = function ($arr, $fn, $initial = null) {
+		if (is_null($initial)) return array_reduce($arr, $fn);
+		return array_reduce($arr, $fn, $initial);
 	};
 
-	$filter = function ($fn, $obj) {
-		return array_filter($obj, $fn);
+	$filter = function ($fn, $arr) {
+		return array_filter($arr, $fn);
 	};
 
 	$find = function ($fn, $arr) {
@@ -141,11 +141,11 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		return null;
 	};
 
-	$each = function ($fn, $obj) {
-		foreach ($obj as $key => $value) {
-			$fn($value, $key, $obj);
+	$each = function ($fn, $arr) {
+		foreach ($arr as $key => $value) {
+			$fn($value, $key, $arr);
 		}
-		return $obj;
+		return $arr;
 	};
 
 
@@ -155,8 +155,8 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		return $obj[$prop];
 	};
 
-	$keys = function ($obj) {
-		return array_keys($obj);
+	$keys = function ($arr) {
+		return array_keys($arr);
 	};
 
 
@@ -169,17 +169,17 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 
 	// Convenience.
 
-	$flatten = function ($obj) {
-		return L::flattenTo(999999, $obj);
+	$flatten = function ($arr) {
+		return L::flattenTo(999999, $arr);
 	};
 
-	$flattenTo = function ($depth, $obj) {
-		if ($depth <= 0) return $obj;
+	$flattenTo = function ($depth, $arr) {
+		if ($depth <= 0) return $arr;
 		return L::reduce( function ($memo, $item) {
 			if (is_array($item)) return array_merge($memo, L::flattenTo($depth - 1, $item));
 			$memo[] = $item;
 			return $memo;
-		}, $obj, array());
+		}, $arr, array());
 	};
 
 	$unique = function ($arr) {
@@ -226,7 +226,7 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		'flip'         => $autoCurry($flip),
 		'flipTo'       => $autoCurry($flipTo),
 		'arity'        => $autoCurry($arity),
-		
+
 		'map'          => $autoCurry($map),
 		'mapOn'        => $autoCurryTo(2, $flip($map)),
 		'reduce'       => $autoCurry($reduce),
@@ -237,12 +237,13 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		'findOn'       => $autoCurryTo(2, $flip($find)),
 		'each'         => $autoCurry($each),
 		'eachOn'       => $autoCurryTo(2, $flip($each)),
-		
+
 		'prop'         => $autoCurry($prop),
+		'propOn'       => $autoCurryTo(2, $flip($prop)),
 		'keys'         => $autoCurry($keys),
-		
+
 		'equals'       => $autoCurry($equals),
-		
+
 		'flatten'      => $autoCurry($flatten),
 		'flattenTo'    => $autoCurry($flattenTo),
 		'unique'       => $autoCurry($unique),
