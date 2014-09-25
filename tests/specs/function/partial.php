@@ -16,7 +16,7 @@ describe("L::partial", function () {
 			->toBe( 'whoareyou' );
 	});
 
-	it("is fully auto-curried", function () use ($join3) {
+	it("is fully auto-curried.", function () use ($join3) {
 		$temp = L::partial($join3);
 		$temp = $temp('a', 'b');
 		expect( $temp('c') )

@@ -113,6 +113,21 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		};
 	};
 
+	$skip = function ($count, $fn) {
+		return function () use (&$count, $fn) {
+			if ($count <= 0) return call_user_func_array($fn, func_get_args());
+			$count--;
+		};
+	};
+
+	$take = function ($count, $fn) {
+		return function () use (&$count, $fn) {
+			if ($count <= 0) return;
+			$count--;
+			return call_user_func_array($fn, func_get_args());
+		};
+	};
+
 
 	// Iteration.
 
@@ -121,12 +136,18 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 	};
 
 	$reduce = function ($fn, $arr, $initial = null) {
-		if (is_null($initial)) return array_reduce($arr, $fn);
+		if (func_num_args() < 3) {
+			$initial = reset($arr);
+			$arr = array_slice($arr, 1);
+		}
 		return array_reduce($arr, $fn, $initial);
 	};
 
 	$reduceOn = function ($arr, $fn, $initial = null) {
-		if (is_null($initial)) return array_reduce($arr, $fn);
+		if (func_num_args() < 3) {
+			$initial = reset($arr);
+			$arr = array_slice($arr, 1);
+		}
 		return array_reduce($arr, $fn, $initial);
 	};
 
@@ -137,6 +158,13 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 	$find = function ($fn, $arr) {
 		foreach ($arr as $key => $value) {
 			if ($fn($value, $key, $arr)) return $value;
+		}
+		return null;
+	};
+
+	$findKey = function ($fn, $arr) {
+		foreach ($arr as $key => $value) {
+			if ($fn($value, $key, $arr)) return $key;
 		}
 		return null;
 	};
@@ -226,7 +254,9 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		'flip'         => $autoCurry($flip),
 		'flipTo'       => $autoCurry($flipTo),
 		'arity'        => $autoCurry($arity),
-
+		'skip'         => $autoCurry($skip),
+		'take'         => $autoCurry($take),
+		
 		'map'          => $autoCurry($map),
 		'mapOn'        => $autoCurryTo(2, $flip($map)),
 		'reduce'       => $autoCurry($reduce),
@@ -235,13 +265,15 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		'filterOn'     => $autoCurryTo(2, $flip($filter)),
 		'find'         => $autoCurry($find),
 		'findOn'       => $autoCurryTo(2, $flip($find)),
+		'findKey'      => $autoCurry($findKey),
+		'findKeyOn'    => $autoCurryTo(2, $flip($findKey)),
 		'each'         => $autoCurry($each),
 		'eachOn'       => $autoCurryTo(2, $flip($each)),
-
+		
 		'prop'         => $autoCurry($prop),
 		'propOn'       => $autoCurryTo(2, $flip($prop)),
 		'keys'         => $autoCurry($keys),
-
+		
 		'equals'       => $autoCurry($equals),
 
 		'flatten'      => $autoCurry($flatten),

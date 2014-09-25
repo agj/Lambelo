@@ -14,4 +14,6 @@ describe("Function", function () {
 	include 'flip.php';
 	include 'flipTo.php';
 	include 'arity.php';
+	include 'skip.php';
+	include 'take.php';
 });
