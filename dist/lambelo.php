@@ -134,6 +134,13 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		return array_filter($obj, $fn);
 	};
 
+	$find = function ($fn, $arr) {
+		foreach ($arr as $key => $value) {
+			if ($fn($value, $key, $arr)) return $value;
+		}
+		return null;
+	};
+
 	$each = function ($fn, $obj) {
 		foreach ($obj as $key => $value) {
 			$fn($value, $key, $obj);
@@ -214,8 +221,8 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		'applyOn'      => $autoCurryTo(2, $flip($apply)),
 		'autoCurry'    => $autoCurry($autoCurry),
 		'autoCurryTo'  => $autoCurry($autoCurryTo),
-		'partial'      => $autoCurry($partial),
-		'partialRight' => $autoCurry($partialRight),
+		'partial'      => $autoCurryTo(2, $partial),
+		'partialRight' => $autoCurryTo(2, $partialRight),
 		'flip'         => $autoCurry($flip),
 		'flipTo'       => $autoCurry($flipTo),
 		'arity'        => $autoCurry($arity),
@@ -226,6 +233,8 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		'reduceOn'     => $autoCurryTo(2, $reduceOn),
 		'filter'       => $autoCurry($filter),
 		'filterOn'     => $autoCurryTo(2, $flip($filter)),
+		'find'         => $autoCurry($find),
+		'findOn'       => $autoCurryTo(2, $flip($find)),
 		'each'         => $autoCurry($each),
 		'eachOn'       => $autoCurryTo(2, $flip($each)),
 		

@@ -2,7 +2,7 @@
 
 describe("L::partial", function () {
 
-	$join3 = function ($a, $b, $c) {
+	$join3 = function ($a = 'x', $b = 'x', $c = 'x') {
 		return $a . $b . $c;
 	};
 
@@ -14,6 +14,13 @@ describe("L::partial", function () {
 		$whoAre = L::partial($join3, 'who', 'are');
 		expect( $whoAre('you') )
 			->toBe( 'whoareyou' );
+	});
+
+	it("is fully auto-curried", function () use ($join3) {
+		$temp = L::partial($join3);
+		$temp = $temp('a', 'b');
+		expect( $temp('c') )
+			->toBe( 'abc' );
 	});
 
 });
