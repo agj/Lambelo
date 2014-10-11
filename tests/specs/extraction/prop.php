@@ -7,7 +7,7 @@ describe("L::prop", function () {
 			->toBe( 10 );
 	});
 
-	it("is fully auto-curried", function () {
+	it("is fully auto-curried.", function () {
 		$temp = L::prop('hi');
 		expect( $temp(array('hi' => 10)) )
 			->toBe( 10 );

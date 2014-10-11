@@ -100,6 +100,12 @@ class __tester__Expect {
 		return $this;
 	}
 
+	public function toBeIn($expectation) {
+		$this->resultFor($this->value, 'to be in', $expectation)
+			->isCorrect(in_array($this->value, $expectation));
+		return $this;
+	}
+
 	public function toThrow() {
 		global $__tester__catchError;
 		$error = $__tester__catchError($this->value);

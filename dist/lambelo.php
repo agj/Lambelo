@@ -27,9 +27,13 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 	$sequence = function () {
 		$fns = func_get_args();
 		return function () use ($fns) {
-			return L::reduce( function ($memo, $fn) {
-				return $fn($memo);
-			}, array_slice($fns, 1), call_user_func_array($fns[0], func_get_args()));
+			return L::reduceOn(
+				array_slice($fns, 1),
+				call_user_func_array($fns[0], func_get_args()),
+				function ($memo, $fn) {
+					return $fn($memo);
+				}
+			);
 		};
 	};
 
@@ -135,19 +139,19 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		return array_map($fn, $arr);
 	};
 
-	$reduce = function ($fn, $arr, $initial = null) {
-		if (func_num_args() < 3) {
-			$initial = reset($arr);
-			$arr = array_slice($arr, 1);
-		}
+	$reduce = function ($fn, $initial, $arr) {
+		// if (func_num_args() < 3) {
+		// 	$initial = reset($arr);
+		// 	$arr = array_slice($arr, 1);
+		// }
 		return array_reduce($arr, $fn, $initial);
 	};
 
-	$reduceOn = function ($arr, $fn, $initial = null) {
-		if (func_num_args() < 3) {
-			$initial = reset($arr);
-			$arr = array_slice($arr, 1);
-		}
+	$reduceOn = function ($arr, $initial, $fn) {
+		// if (func_num_args() < 3) {
+		// 	$initial = reset($arr);
+		// 	$arr = array_slice($arr, 1);
+		// }
 		return array_reduce($arr, $fn, $initial);
 	};
 
@@ -195,7 +199,7 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 	};
 
 
-	// Convenience.
+	// Array.
 
 	$flatten = function ($arr) {
 		return L::flattenTo(999999, $arr);
@@ -203,19 +207,19 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 
 	$flattenTo = function ($depth, $arr) {
 		if ($depth <= 0) return $arr;
-		return L::reduce( function ($memo, $item) {
+		return L::reduceOn($arr, array(), function ($memo, $item) {
 			if (is_array($item)) return array_merge($memo, L::flattenTo($depth - 1, $item));
 			$memo[] = $item;
 			return $memo;
-		}, $arr, array());
+		});
 	};
 
 	$unique = function ($arr) {
-		return L::reduce( function ($memo, $item) {
+		return L::reduceOn($arr, array(), function ($memo, $item) {
 			if (in_array($item, $memo)) return $memo;
 			$memo[] = $item;
 			return $memo;
-		}, $arr, array());
+		});
 	};
 
 	$sort = function ($arr) use ($ascSort) {
@@ -241,6 +245,7 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 	// Defining utilities.
 
 	L::$fns = array(
+		// Function.
 		'compose'      => $autoCurryTo(1, $compose),
 		'sequence'     => $autoCurryTo(1, $sequence),
 		'call'         => $autoCurryTo(2, $call),
@@ -256,11 +261,12 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		'arity'        => $autoCurry($arity),
 		'skip'         => $autoCurry($skip),
 		'take'         => $autoCurry($take),
-		
+
+		// Iteration.
+		'reduce'       => $autoCurry($reduce),
+		'reduceOn'     => $autoCurry($reduceOn),
 		'map'          => $autoCurry($map),
 		'mapOn'        => $autoCurryTo(2, $flip($map)),
-		'reduce'       => $autoCurry($reduce),
-		'reduceOn'     => $autoCurryTo(2, $reduceOn),
 		'filter'       => $autoCurry($filter),
 		'filterOn'     => $autoCurryTo(2, $flip($filter)),
 		'find'         => $autoCurry($find),
@@ -269,13 +275,16 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		'findKeyOn'    => $autoCurryTo(2, $flip($findKey)),
 		'each'         => $autoCurry($each),
 		'eachOn'       => $autoCurryTo(2, $flip($each)),
-		
+
+		// Extraction.
 		'prop'         => $autoCurry($prop),
 		'propOn'       => $autoCurryTo(2, $flip($prop)),
 		'keys'         => $autoCurry($keys),
-		
+
+		// Comparison.
 		'equals'       => $autoCurry($equals),
 
+		// Array.
 		'flatten'      => $autoCurry($flatten),
 		'flattenTo'    => $autoCurry($flattenTo),
 		'unique'       => $autoCurry($unique),
