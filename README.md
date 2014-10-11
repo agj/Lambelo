@@ -9,28 +9,31 @@ This means making the best of anonymous functions, a.k.a. lambdas or closures.
 Example
 -------
 
-The following exemplifies using the `L::map` function on an array,
-which transforms each value by passing it through a supplied function,
-and returns a new array (equivalent to PHP's native `array_map`).
+The following exemplifies using the `L::map()` (and `L::mapOn()`) function on an array,
+which passes each value to a function an constructs a new array with the return values.
+It uses PHP's native `array_map`, but makes it easy to compose by being curried automatically.
 
 ```php
 require_once 'lambelo.php';
 
-$times10 = function ($n) {
-	return $n * 10;
+$treble = function ($n) {
+	return $n * 3;
 };
 
-// Use straight:
+// L::map() takes a the function first.
 
-L::map($times10, array(1, 2, 3, 4)); // > array(10, 20, 30, 40)
+$trebleAll = L::map($treble);
 
-// Or take advantage of the auto-currying functionality:
+$trebleAll(array(1, 2, 3)); // array(3, 6, 9)
 
-$mapTimes10 = L::map($times10);
+// L::mapOn() takes the array first.
 
-$mapTimes10(array(5, 6, 7));  // > array(50, 60, 70)
-$mapTimes10(array(8, 9, 10)); // > array(80, 90, 100)
+$onPrimes = L::mapOn(array(2, 3, 5, 7));
+
+$onPrimes($treble); // array(6, 9, 15, 21)
 ```
+
+When it makes sense, Lambelo's functions have an accompanying `~On` function that take the function last.
 
 
 Why
