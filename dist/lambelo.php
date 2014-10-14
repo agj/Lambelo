@@ -27,7 +27,7 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 	$sequence = function () {
 		$fns = func_get_args();
 		return function () use ($fns) {
-			return L::reduceOn(
+			return L::foldOn(
 				array_slice($fns, 1),
 				call_user_func_array($fns[0], func_get_args()),
 				function ($memo, $fn) {
@@ -135,24 +135,18 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 
 	// Iteration.
 
+	$fold = function ($fn, $initial, $arr) {
+		return array_reduce($arr, $fn, $initial);
+	};
+
+	$reduce = function ($fn, $arr) {
+		$initial = reset($arr);
+		$arr = array_slice($arr, 1);
+		return array_reduce($arr, $fn, $initial);
+	};
+
 	$map = function ($fn, $arr) {
 		return array_map($fn, $arr);
-	};
-
-	$reduce = function ($fn, $initial, $arr) {
-		// if (func_num_args() < 3) {
-		// 	$initial = reset($arr);
-		// 	$arr = array_slice($arr, 1);
-		// }
-		return array_reduce($arr, $fn, $initial);
-	};
-
-	$reduceOn = function ($arr, $initial, $fn) {
-		// if (func_num_args() < 3) {
-		// 	$initial = reset($arr);
-		// 	$arr = array_slice($arr, 1);
-		// }
-		return array_reduce($arr, $fn, $initial);
 	};
 
 	$filter = function ($fn, $arr) {
@@ -207,7 +201,7 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 
 	$flattenTo = function ($depth, $arr) {
 		if ($depth <= 0) return $arr;
-		return L::reduceOn($arr, array(), function ($memo, $item) {
+		return L::foldOn($arr, array(), function ($memo, $item) {
 			if (is_array($item)) return array_merge($memo, L::flattenTo($depth - 1, $item));
 			$memo[] = $item;
 			return $memo;
@@ -215,7 +209,7 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 	};
 
 	$unique = function ($arr) {
-		return L::reduceOn($arr, array(), function ($memo, $item) {
+		return L::foldOn($arr, array(), function ($memo, $item) {
 			if (in_array($item, $memo)) return $memo;
 			$memo[] = $item;
 			return $memo;
@@ -263,8 +257,10 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		'take'         => $autoCurry($take),
 
 		// Iteration.
+		'fold'         => $autoCurry($fold),
+		'foldOn'       => $autoCurryTo(3, $flip($fold)),
 		'reduce'       => $autoCurry($reduce),
-		'reduceOn'     => $autoCurry($reduceOn),
+		'reduceOn'     => $autoCurryTo(2, $flip($reduce)),
 		'map'          => $autoCurry($map),
 		'mapOn'        => $autoCurryTo(2, $flip($map)),
 		'filter'       => $autoCurry($filter),

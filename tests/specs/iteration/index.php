@@ -1,6 +1,8 @@
 <?php
 
 describe("Iteration", function () {
+	include 'fold.php';
+	include 'foldOn.php';
 	include 'reduce.php';
 	include 'reduceOn.php';
 	include 'map.php';
