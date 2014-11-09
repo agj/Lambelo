@@ -7,8 +7,8 @@ describe("Function", function () {
 	include 'callOn.php';
 	include 'apply.php';
 	include 'applyOn.php';
-	include 'autoCurry.php';
-	include 'autoCurryTo.php';
+	include 'curry.php';
+	include 'curryTo.php';
 	include 'partial.php';
 	include 'partialRight.php';
 	include 'flip.php';

@@ -59,24 +59,24 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 		return call_user_func_array($fn, $args);
 	};
 
-	$autoCurryTo = function ($arity, $fn) use (&$autoCurryTo) {
-		return function () use ($fn, $arity, $autoCurryTo) {
+	$curryTo = function ($arity, $fn) use (&$curryTo) {
+		return function () use ($fn, $arity, $curryTo) {
 			$numArgs = func_num_args();
 			if ($numArgs >= $arity) {
 				return call_user_func_array($fn, func_get_args());
 			} else {
 				$args = func_get_args();
-				return $autoCurryTo($arity - $numArgs, function () use ($fn, $args) {
+				return $curryTo($arity - $numArgs, function () use ($fn, $args) {
 					return call_user_func_array($fn, array_merge($args, func_get_args()));
 				});
 			}
 		};
 	};
 
-	$autoCurry = function ($fn) use ($autoCurryTo) {
+	$curry = function ($fn) use ($curryTo) {
 		$ref = new ReflectionFunction($fn);
 		$arity = $ref->getNumberOfRequiredParameters();
-		return $autoCurryTo($arity, $fn);
+		return $curryTo($arity, $fn);
 	};
 
 	$partial = function ($fn) {
@@ -240,52 +240,52 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 
 	L::$fns = array(
 		// Function.
-		'compose'      => $autoCurryTo(1, $compose),
-		'sequence'     => $autoCurryTo(1, $sequence),
-		'call'         => $autoCurryTo(2, $call),
-		'callOn'       => $autoCurryTo(2, $callOn),
-		'apply'        => $autoCurry($apply),
-		'applyOn'      => $autoCurryTo(2, $flip($apply)),
-		'autoCurry'    => $autoCurry($autoCurry),
-		'autoCurryTo'  => $autoCurry($autoCurryTo),
-		'partial'      => $autoCurryTo(2, $partial),
-		'partialRight' => $autoCurryTo(2, $partialRight),
-		'flip'         => $autoCurry($flip),
-		'flipTo'       => $autoCurry($flipTo),
-		'arity'        => $autoCurry($arity),
-		'skip'         => $autoCurry($skip),
-		'take'         => $autoCurry($take),
+		'compose'      => $curryTo(1, $compose),
+		'sequence'     => $curryTo(1, $sequence),
+		'call'         => $curryTo(2, $call),
+		'callOn'       => $curryTo(2, $callOn),
+		'apply'        => $curry($apply),
+		'applyOn'      => $curryTo(2, $flip($apply)),
+		'curry'    => $curry($curry),
+		'curryTo'  => $curry($curryTo),
+		'partial'      => $curryTo(2, $partial),
+		'partialRight' => $curryTo(2, $partialRight),
+		'flip'         => $curry($flip),
+		'flipTo'       => $curry($flipTo),
+		'arity'        => $curry($arity),
+		'skip'         => $curry($skip),
+		'take'         => $curry($take),
 
 		// Iteration.
-		'fold'         => $autoCurry($fold),
-		'foldOn'       => $autoCurryTo(3, $flip($fold)),
-		'reduce'       => $autoCurry($reduce),
-		'reduceOn'     => $autoCurryTo(2, $flip($reduce)),
-		'map'          => $autoCurry($map),
-		'mapOn'        => $autoCurryTo(2, $flip($map)),
-		'filter'       => $autoCurry($filter),
-		'filterOn'     => $autoCurryTo(2, $flip($filter)),
-		'find'         => $autoCurry($find),
-		'findOn'       => $autoCurryTo(2, $flip($find)),
-		'findKey'      => $autoCurry($findKey),
-		'findKeyOn'    => $autoCurryTo(2, $flip($findKey)),
-		'each'         => $autoCurry($each),
-		'eachOn'       => $autoCurryTo(2, $flip($each)),
+		'fold'         => $curry($fold),
+		'foldOn'       => $curryTo(3, $flip($fold)),
+		'reduce'       => $curry($reduce),
+		'reduceOn'     => $curryTo(2, $flip($reduce)),
+		'map'          => $curry($map),
+		'mapOn'        => $curryTo(2, $flip($map)),
+		'filter'       => $curry($filter),
+		'filterOn'     => $curryTo(2, $flip($filter)),
+		'find'         => $curry($find),
+		'findOn'       => $curryTo(2, $flip($find)),
+		'findKey'      => $curry($findKey),
+		'findKeyOn'    => $curryTo(2, $flip($findKey)),
+		'each'         => $curry($each),
+		'eachOn'       => $curryTo(2, $flip($each)),
 
 		// Extraction.
-		'prop'         => $autoCurry($prop),
-		'propOn'       => $autoCurryTo(2, $flip($prop)),
-		'keys'         => $autoCurry($keys),
+		'prop'         => $curry($prop),
+		'propOn'       => $curryTo(2, $flip($prop)),
+		'keys'         => $curry($keys),
 
 		// Comparison.
-		'equals'       => $autoCurry($equals),
+		'equals'       => $curry($equals),
 
 		// Array.
-		'flatten'      => $autoCurry($flatten),
-		'flattenTo'    => $autoCurry($flattenTo),
-		'unique'       => $autoCurry($unique),
-		'sort'         => $autoCurry($sort),
-		'sortBy'       => $autoCurry($sortBy),
+		'flatten'      => $curry($flatten),
+		'flattenTo'    => $curry($flattenTo),
+		'unique'       => $curry($unique),
+		'sort'         => $curry($sort),
+		'sortBy'       => $curry($sortBy),
 	);
 
 });
