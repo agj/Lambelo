@@ -7,6 +7,8 @@ describe("Iteration", function () {
 	include 'reduceOn.php';
 	include 'map.php';
 	include 'mapOn.php';
+	include 'mapIdx.php';
+	include 'mapIdxOn.php';
 	include 'filter.php';
 	include 'filterOn.php';
 	include 'find.php';

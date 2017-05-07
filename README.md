@@ -1,6 +1,6 @@
 
-Lambelo
-=======
+Lambelo 1.1.0
+=============
 
 A very much in-progress, small **PHP 5.3+** library designed to facilitate functional programming.
 This means making the best of anonymous functions, a.k.a. lambdas or closures.
@@ -50,6 +50,12 @@ When I need to do PHP work, it's become painful enough that I figured I needed t
 While I know of certain PHP libraries that claim to facilitate functional programming, they don't make it easy to compose functions;
 particularly lacking is partial application/currying.
 That's why I felt the need to start this one.
+
+
+Documentation
+-------------
+
+There is currently no documentation, but the tests demonstrate all of the available utilities. Check the `tests` folder.
 
 
 License
