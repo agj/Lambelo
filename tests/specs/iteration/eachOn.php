@@ -17,7 +17,7 @@ describe("L::eachOn", function () {
 			->toBe( 5 );
 	});
 
-	it("is fully auto-curried.", function () use ($check) {
+	it("is fully auto-curried.", function () {
 		$arr = array(1, 2, 3, 4, 5);
 		$count = 0;
 
