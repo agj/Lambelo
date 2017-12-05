@@ -205,7 +205,7 @@ call_user_func( function () { // Creating a closure to prevent variable leakage.
 
 	$flattenTo = function ($depth, $arr) {
 		if ($depth <= 0) return $arr;
-		return L::foldOn($arr, array(), function ($memo, $item) {
+		return L::foldOn($arr, array(), function ($memo, $item) use ($depth) {
 			if (is_array($item)) return array_merge($memo, L::flattenTo($depth - 1, $item));
 			$memo[] = $item;
 			return $memo;
